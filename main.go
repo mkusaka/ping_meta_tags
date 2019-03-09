@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
 	"log"
 	"net/http"
@@ -42,12 +43,31 @@ func scrape(url string) {
 		log.Fatal(err)
 	}
 
+	file := resultCsvFile()
+	writer := csv.NewWriter(file)
 	doc.Find("head").Each(func(i int, s *goquery.Selection) {
 		s.Find("meta").Each(func(j int, m *goquery.Selection) {
 			mv, _ := m.Attr("content")
-			fmt.Printf("meta %s\n", mv)
+			fmt.Println(mv)
 		})
 	})
+}
+
+func resultCsvFile() *os.File {
+	file, err := os.OpenFile("tmp/result.csv", os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+
+	err = file.Truncate(0)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return file
 }
 
 func main() {
