@@ -24,6 +24,7 @@ archive:
     amd64: x86_64
   files:
     - README.md
+  format: zip
 checksum:
   name_template: 'checksums.txt'
 snapshot:
