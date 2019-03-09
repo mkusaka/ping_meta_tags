@@ -19,3 +19,7 @@ CSV format is below.
 |url|property value|name value|content value|timestamp|
 | --- | --- | --- | --- | --- |
 |url1|prop1|name1|content1|unix timestamp1|
+
+# download
+for windows, linux, macos binary can download from below.
+https://github.com/mkusaka/ping_meta_tags/releases
