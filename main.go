@@ -75,8 +75,51 @@ func resultCsvFile() *os.File {
 	return file
 }
 
+func touchFile(filename string) {
+	if fileOrDirExistence(filename) {
+		return
+	}
+
+	file, err := os.Create(filename)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file.Close()
+}
+
+func makeTmpDir() error {
+	if fileOrDirExistence("tmp") {
+		return nil
+	}
+	return os.Mkdir("tmp", 0777)
+}
+
+func fileOrDirExistence(path string) bool {
+	_, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
 func main() {
+	err := makeTmpDir()
+	if err != nil {
+		log.Fatal("I can't make tmp under current directory.")
+	}
+
+	touchFile(".env")
+
 	urls := getUrls()
+
+	if urls[0] == "" {
+		log.Fatal("url must be at .env file (or enviroment variable). like `url=url1,url2` format.")
+		return
+	}
+
 	scrape(urls)
 	fmt.Println("finish scrape" + strings.Join(urls, ","))
 }
