@@ -43,14 +43,22 @@ func scrape(url string) {
 		log.Fatal(err)
 	}
 
-	file := resultCsvFile()
+	file, err := os.Create("tmp/result.csv")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
 	writer := csv.NewWriter(file)
 	doc.Find("head").Each(func(i int, s *goquery.Selection) {
-		s.Find("meta").Each(func(j int, m *goquery.Selection) {
-			mv, _ := m.Attr("content")
-			fmt.Println(mv)
+		contents := s.Find("meta").Map(func(j int, m *goquery.Selection) string {
+			content, _ := m.Attr("content")
+			return content
 		})
+		writer.Write(contents)
 	})
+	writer.Flush()
 }
 
 func resultCsvFile() *os.File {
