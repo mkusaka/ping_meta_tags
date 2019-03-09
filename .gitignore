@@ -48,6 +48,6 @@ Temporary Items
 
 .env
 
-tmp/result.csv
+tmp/
 
 dist/
