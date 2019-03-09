@@ -51,12 +51,16 @@ func scrape(url string) {
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
+	headers := []string{"property", "name", "content"}
+	writer.Write(headers)
 	doc.Find("head").Each(func(i int, s *goquery.Selection) {
-		contents := s.Find("meta").Map(func(j int, m *goquery.Selection) string {
+		s.Find("meta").Each(func(j int, m *goquery.Selection) {
+			property, _ := m.Attr("property")
+			name, _ := m.Attr("name")
 			content, _ := m.Attr("content")
-			return content
+			information := []string{property, name, content}
+			writer.Write(information)
 		})
-		writer.Write(contents)
 	})
 	writer.Flush()
 }
