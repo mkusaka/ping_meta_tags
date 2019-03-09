@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/joho/godotenv"
@@ -51,14 +52,14 @@ func scrape(url string) {
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
-	headers := []string{"property", "name", "content"}
+	headers := []string{"url", "property", "name", "content", "timestamp"}
 	writer.Write(headers)
 	doc.Find("head").Each(func(i int, s *goquery.Selection) {
 		s.Find("meta").Each(func(j int, m *goquery.Selection) {
 			property, _ := m.Attr("property")
 			name, _ := m.Attr("name")
 			content, _ := m.Attr("content")
-			information := []string{property, name, content}
+			information := []string{url, property, name, content, string(time.Now().Unix())}
 			writer.Write(information)
 		})
 	})
