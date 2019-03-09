@@ -1,0 +1,2 @@
+#!/bin/bash
+goreleaser --release-notes=<(git log --pretty=oneline --abbrev-commit $(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0)^)..$(git describe --tags --abbrev=0) | sort | grep "Merge pull request")
