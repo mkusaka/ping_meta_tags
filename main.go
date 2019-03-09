@@ -10,13 +10,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+func getUrl() string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	url := os.Getenv("url")
+
+	return url
+}
+
+func scrape(url string) {
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -33,4 +38,9 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("[body] " + string(body))
+}
+
+func main() {
+	url := getUrl()
+	scrape(url)
 }
