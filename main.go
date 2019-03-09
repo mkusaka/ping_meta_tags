@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/joho/godotenv"
 )
 
@@ -32,12 +32,22 @@ func scrape(url string) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != 200 {
+		log.Fatal("invalid status code")
+	}
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("[body] " + string(body))
+
+	doc.Find("head").Each(func(i int, s *goquery.Selection) {
+		s.Find("meta").Each(func(j int, m *goquery.Selection) {
+			mv, _ := m.Attr("content")
+			fmt.Printf("meta %s\n", mv)
+		})
+	})
 }
 
 func main() {
