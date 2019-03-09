@@ -48,6 +48,8 @@ Temporary Items
 
 .env
 
-tmp/result.csv
+tmp/
+
+ping_meta_tags
 
 dist/
