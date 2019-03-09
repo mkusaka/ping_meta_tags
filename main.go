@@ -78,5 +78,5 @@ func resultCsvFile() *os.File {
 func main() {
 	urls := getUrls()
 	scrape(urls)
-	fmt.Println("finish scrape" + urls)
+	fmt.Println("finish scrape" + strings.Join(urls, ","))
 }
