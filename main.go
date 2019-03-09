@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -25,35 +24,7 @@ func getUrls() []string {
 	return urls
 }
 
-func fetch(url string) *http.Response {
-	resp, err := http.Get(url)
-
-	if err != nil {
-		log.Fatal("Error get" + url + "is fail")
-	}
-
-	fmt.Printf("[status] %d \n", resp.StatusCode)
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode != 200 {
-		log.Fatal("invalid status code")
-	}
-
-	return resp
-}
-
-func fetchAll(urls []string) []*http.Response {
-	responses := []*http.Response{}
-	for _, url := range urls {
-		responses = append(responses, fetch(url))
-	}
-	return responses
-}
-
 func scrape(urls []string) {
-
-	responses := fetchAll(urls)
 
 	file, err := os.Create("tmp/result.csv")
 
@@ -65,8 +36,8 @@ func scrape(urls []string) {
 
 	writer := csv.NewWriter(file)
 
-	for idx, response := range responses {
-		doc, err := goquery.NewDocumentFromReader(response.Body)
+	for idx, url := range urls {
+		doc, err := goquery.NewDocument(url)
 
 		if err != nil {
 			log.Fatal(err)
@@ -107,4 +78,5 @@ func resultCsvFile() *os.File {
 func main() {
 	urls := getUrls()
 	scrape(urls)
+	fmt.Println("finish scrape" + urls)
 }
