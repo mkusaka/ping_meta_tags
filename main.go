@@ -6,24 +6,26 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/joho/godotenv"
 )
 
-func getUrl() string {
+func getUrls() []string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	url := os.Getenv("url")
+	urlstrings := os.Getenv("url")
+	urls := strings.Split(urlstrings, ",")
 
-	return url
+	return urls
 }
 
-func scrape(url string) {
+func fetch(url string) *http.Response {
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -38,32 +40,50 @@ func scrape(url string) {
 		log.Fatal("invalid status code")
 	}
 
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	return resp
+}
 
-	if err != nil {
-		log.Fatal(err)
+func fetchAll(urls []string) []*http.Response {
+	responses := []*http.Response{}
+	for _, url := range urls {
+		responses = append(responses, fetch(url))
 	}
+	return responses
+}
 
-	file, err := os.Create("tmp/result.csv")
+func scrape(urls []string) {
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	responses := fetchAll(urls)
 
-	writer := csv.NewWriter(file)
-	headers := []string{"url", "property", "name", "content", "timestamp"}
-	writer.Write(headers)
-	doc.Find("head").Each(func(i int, s *goquery.Selection) {
-		s.Find("meta").Each(func(j int, m *goquery.Selection) {
-			property, _ := m.Attr("property")
-			name, _ := m.Attr("name")
-			content, _ := m.Attr("content")
-			information := []string{url, property, name, content, string(time.Now().Unix())}
-			writer.Write(information)
+	for idx, response := range responses {
+		doc, err := goquery.NewDocumentFromReader(response.Body)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		file, err := os.Create("tmp/result.csv")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer file.Close()
+
+		writer := csv.NewWriter(file)
+		headers := []string{"url", "property", "name", "content", "timestamp"}
+		writer.Write(headers)
+		doc.Find("head").Each(func(i int, s *goquery.Selection) {
+			s.Find("meta").Each(func(j int, m *goquery.Selection) {
+				property, _ := m.Attr("property")
+				name, _ := m.Attr("name")
+				content, _ := m.Attr("content")
+				information := []string{urls[idx], property, name, content, string(time.Now().Unix())}
+				writer.Write(information)
+			})
 		})
-	})
-	writer.Flush()
+		writer.Flush()
+	}
 }
 
 func resultCsvFile() *os.File {
@@ -84,6 +104,6 @@ func resultCsvFile() *os.File {
 }
 
 func main() {
-	url := getUrl()
-	scrape(url)
+	urls := getUrls()
+	scrape(urls)
 }
