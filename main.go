@@ -59,24 +59,6 @@ func scrape(urls []string) {
 	writer.Flush()
 }
 
-func resultCsvFile() *os.File {
-	file, err := os.OpenFile("tmp/result.csv", os.O_WRONLY|os.O_CREATE, 0600)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer file.Close()
-
-	err = file.Truncate(0)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return file
-}
-
 func touchFile(filename string) {
 	if fileOrDirExistence(filename) {
 		return
