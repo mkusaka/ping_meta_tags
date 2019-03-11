@@ -14,6 +14,7 @@ import (
 
 func getUrls() []string {
 	err := godotenv.Load()
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -50,29 +51,12 @@ func scrape(urls []string) {
 				property, _ := m.Attr("property")
 				name, _ := m.Attr("name")
 				content, _ := m.Attr("content")
-				information := []string{urls[idx], property, name, content, string(time.Now().Unix())}
+				information := []string{urls[idx], property, name, content, time.Now().String()}
 				writer.Write(information)
 			})
 		})
 	}
 	writer.Flush()
-}
-
-func resultCsvFile() *os.File {
-	file, err := os.OpenFile("tmp/result.csv", os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer file.Close()
-
-	err = file.Truncate(0)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return file
 }
 
 func touchFile(filename string) {
@@ -93,6 +77,7 @@ func makeTmpDir() error {
 	if fileOrDirExistence("tmp") {
 		return nil
 	}
+
 	return os.Mkdir("tmp", 0777)
 }
 
@@ -102,20 +87,22 @@ func fileOrDirExistence(path string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+
 	return true
 }
 
 func main() {
 	err := makeTmpDir()
+
 	if err != nil {
-		log.Fatal("I can't make tmp under current directory.")
+		log.Fatal("can't make tmp under current directory.")
 	}
 
 	touchFile(".env")
 
 	urls := getUrls()
 
-	if urls[0] == "" {
+	if urls[0] == "" { // TODO: make better condition
 		log.Fatal("url must be at .env file (or enviroment variable). like `url=url1,url2` format.")
 		return
 	}
