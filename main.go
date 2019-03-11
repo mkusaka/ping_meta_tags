@@ -14,6 +14,7 @@ import (
 
 func getUrls() []string {
 	err := godotenv.Load()
+
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -60,6 +61,7 @@ func scrape(urls []string) {
 
 func resultCsvFile() *os.File {
 	file, err := os.OpenFile("tmp/result.csv", os.O_WRONLY|os.O_CREATE, 0600)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -93,6 +95,7 @@ func makeTmpDir() error {
 	if fileOrDirExistence("tmp") {
 		return nil
 	}
+
 	return os.Mkdir("tmp", 0777)
 }
 
@@ -102,13 +105,15 @@ func fileOrDirExistence(path string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+
 	return true
 }
 
 func main() {
 	err := makeTmpDir()
+
 	if err != nil {
-		log.Fatal("I can't make tmp under current directory.")
+		log.Fatal("can't make tmp under current directory.")
 	}
 
 	touchFile(".env")
