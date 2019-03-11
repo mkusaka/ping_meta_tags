@@ -102,7 +102,7 @@ func main() {
 
 	urls := getUrls()
 
-	if urls[0] == "" {
+	if urls[0] == "" { // TODO: make better condition
 		log.Fatal("url must be at .env file (or enviroment variable). like `url=url1,url2` format.")
 		return
 	}
