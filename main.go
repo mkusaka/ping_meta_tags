@@ -51,7 +51,7 @@ func scrape(urls []string) {
 				property, _ := m.Attr("property")
 				name, _ := m.Attr("name")
 				content, _ := m.Attr("content")
-				information := []string{urls[idx], property, name, content, string(time.Now().Unix())}
+				information := []string{urls[idx], property, name, content, time.Now().String()}
 				writer.Write(information)
 			})
 		})
